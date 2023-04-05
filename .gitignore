@@ -1,3 +1,4 @@
 *.pyc
 /build/*
 /pyscada_systemstat.egg-info/*
+/.idea/*
