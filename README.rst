@@ -1,5 +1,5 @@
 PyScada systemstat Extension
-======================
+============================
 
 This is a extension for PyScada to support gathering system statistics.
 
