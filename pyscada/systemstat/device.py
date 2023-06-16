@@ -606,7 +606,10 @@ class Handler(GenericHandlerDevice):
                 err = e.read().decode()
                 err = err[:-1] if err.endswith('\n')else err
                 if err != '':
-                    logger.warning(f'Error {err} while running on {self._device} command {cmd}')
+                    if "ImportError: No module named 'psutil'" in err:
+                        logger.warning(f'psutil not installed on {self._device} !')
+                    else:
+                        logger.warning(f'Error {err} while running on {self._device} command {cmd}')
                 value = o.read().decode()
                 value = value[:-1] if value.endswith('\n') else value
                 value = None if value == '' else value
