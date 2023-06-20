@@ -377,12 +377,14 @@ class Handler(GenericHandlerDevice):
                     except Exception as e:
                         value = str(e)
             elif item.systemstatvariable.information == 40:
+            elif item.systemstatvariable.information == 41:
+                # check if directory is mounted
                 try:
-                    cmd = 'os.path.getmtime("' + str(item.systemstatvariable.parameter) + '")'
+                    cmd = 'os.path.ismount("' + str(item.systemstatvariable.parameter) + '")'
                     ssh_prefix = 'import os;'
                     value = self.exec_python_cmd(cmd, ssh_prefix=ssh_prefix)
                 except FileNotFoundError:
-                    logger.warning(f"File or directory {param} not found. Cannot get last modification time.")
+                    logger.warning(f"File or directory {item.systemstatvariable.parameter} not found. Cannot check if it is mounted.")
             elif 100 <= item.systemstatvariable.information <= 105:
                 # APCUPSD Status
                 apcupsd_status = None

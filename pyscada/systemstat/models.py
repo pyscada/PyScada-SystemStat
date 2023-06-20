@@ -71,6 +71,7 @@ class SystemStatVariable(models.Model):
         (21, 'run command'),
         (22, 'ssh availability'),
         (40, 'file or directory last modification time'),
+        (41, 'is directory mounted'),
         (100, 'APCUPSD Online Status (True/False)'),
         (101, 'APCUPSD Line Voltage'),  # Volts
         (102, 'APCUPSD Battery Voltage'),  # Volts
