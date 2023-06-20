@@ -69,6 +69,7 @@ class SystemStatVariable(models.Model):
         (19, 'network_ip_address'),
         (20, 'process_pid'),
         (21, 'run command'),
+        (22, 'ssh availability'),
         (40, 'file or directory last modification time'),
         (100, 'APCUPSD Online Status (True/False)'),
         (101, 'APCUPSD Line Voltage'),  # Volts

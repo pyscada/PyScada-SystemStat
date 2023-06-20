@@ -99,6 +99,9 @@ class Handler(GenericHandlerDevice):
         return False
 
     def write_data(self, variable_id, value, task):
+        """
+        (21,'run command'),
+        """
         var = Variable.objects.get(id=variable_id)
         cmd = var.systemstatvariable.parameter
         if var.systemstatvariable.information == 21:
@@ -160,6 +163,7 @@ class Handler(GenericHandlerDevice):
         (18,'disk_usage_disk_percent'),
         (19,'network_ip_address'),
         (20,'process_pid'),
+        (22,'ssh availability'),
         (40,'file or directory last modification time'),
         ### APCUPSD Status
         (100, 'STATUS'), # True/False
@@ -354,6 +358,24 @@ class Handler(GenericHandlerDevice):
                     ssh_prefix = f'import psutil\nvalue=-3\nfor proc in psutil.process_iter():\n    try:\n        for cmd in proc.cmdline():\n            if "{processName}".lower() in cmd.lower() and "for proc in psutil.process_iter():" not in cmd.lower():\n                value = proc.pid\n                break\n    except psutil.ZombieProcess:\n        value = -1\n    except psutil.AccessDenied:\n        value = -2\n    except psutil.NoSuchProcess:\n        value = -3\n'
                     value = self.exec_python_cmd(cmd, ssh_prefix=ssh_prefix)
                     value = -3 if value == '' else value
+            elif item.systemstatvariable.information == 22:
+                timestamp = time()
+                if self._device.systemstatdevice.system_type == 0:
+                    value = "Cannot test ssh availability on local SystemStat device."
+                elif self._device.systemstatdevice.system_type == 1:
+                    hostname = self._device.systemstatdevice.host
+                    port = self._device.systemstatdevice.port
+                    username = self._device.systemstatdevice.username
+                    password = self._device.systemstatdevice.password
+                    timeout = self._device.systemstatdevice.timeout
+                    inst = paramiko.SSHClient()
+                    inst.load_system_host_keys()
+                    inst.set_missing_host_key_policy(paramiko.WarningPolicy())
+                    try:
+                        inst.connect(hostname, port, username, password, timeout=timeout)
+                        value = "OK"
+                    except Exception as e:
+                        value = str(e)
             elif item.systemstatvariable.information == 40:
                 try:
                     cmd = 'os.path.getmtime("' + str(item.systemstatvariable.parameter) + '")'
