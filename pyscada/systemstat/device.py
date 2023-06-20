@@ -377,6 +377,15 @@ class Handler(GenericHandlerDevice):
                     except Exception as e:
                         value = str(e)
             elif item.systemstatvariable.information == 40:
+                param = item.systemstatvariable.parameter
+                try:
+                    cmd = 'os.path.getmtime("' + str(param) + '")'
+                    ssh_prefix = 'import os;'
+                    value = self.exec_python_cmd(cmd, ssh_prefix=ssh_prefix)
+                except FileNotFoundError:
+                    value = "File or directory not found"
+                except OSError:
+                    value = "File or directory access error"
             elif item.systemstatvariable.information == 41:
                 # check if directory is mounted
                 try:
