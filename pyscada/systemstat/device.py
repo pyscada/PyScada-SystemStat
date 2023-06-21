@@ -32,12 +32,12 @@ driver_ok = True
 try:
     import psutil
 except ImportError:
-    logger.error("Cannot import psutil")
+    logger.error("Cannot import psutil", exc_info=True)
     driver_ok = False
 try:
     import paramiko
 except ImportError:
-    logger.error("Cannot import paramiko")
+    logger.error("Cannot import paramiko", exc_info=True)
     driver_ok = False
 
 MEDIA_ROOT = settings.MEDIA_ROOT \
