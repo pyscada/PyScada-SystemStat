@@ -6,14 +6,16 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('systemstat', '0005_extendedsystemstatdevice_extendedsystemstatvariable'),
+        ("systemstat", "0005_extendedsystemstatdevice_extendedsystemstatvariable"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='extendedsystemstatvariable',
-            options={'verbose_name': 'SystemStat Variable', 'verbose_name_plural': 'SystemStat Variables'},
+            name="extendedsystemstatvariable",
+            options={
+                "verbose_name": "SystemStat Variable",
+                "verbose_name_plural": "SystemStat Variables",
+            },
         ),
     ]

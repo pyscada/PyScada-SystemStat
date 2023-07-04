@@ -11,8 +11,12 @@ __app_name__ = "SystemStat"
 
 PROTOCOL_ID = 2
 
-parent_process_list = [{'pk': PROTOCOL_ID,
-                        'label': 'pyscada.systemstat',
-                        'process_class': 'pyscada.systemstat.worker.Process',
-                        'process_class_kwargs': '{"dt_set":30}',
-                        'enabled': True}]
+parent_process_list = [
+    {
+        "pk": PROTOCOL_ID,
+        "label": "pyscada.systemstat",
+        "process_class": "pyscada.systemstat.worker.Process",
+        "process_class_kwargs": '{"dt_set":30}',
+        "enabled": True,
+    }
+]

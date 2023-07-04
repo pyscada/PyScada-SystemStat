@@ -1,7 +1,11 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from pyscada.systemstat.models import SystemStatVariable, ExtendedSystemStatDevice, ExtendedSystemStatVariable
+from pyscada.systemstat.models import (
+    SystemStatVariable,
+    ExtendedSystemStatDevice,
+    ExtendedSystemStatVariable,
+)
 from pyscada.systemstat import PROTOCOL_ID
 from pyscada.admin import admin_site
 from pyscada.admin import DeviceAdmin
@@ -16,10 +20,12 @@ logger = logging.getLogger(__name__)
 
 class SystemStatDeviceAdmin(DeviceAdmin):
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
-        if db_field.name == 'protocol':
-            kwargs['queryset'] = DeviceProtocol.objects.filter(pk=PROTOCOL_ID)
+        if db_field.name == "protocol":
+            kwargs["queryset"] = DeviceProtocol.objects.filter(pk=PROTOCOL_ID)
             db_field.default = PROTOCOL_ID
-        return super(SystemStatDeviceAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
+        return super(SystemStatDeviceAdmin, self).formfield_for_foreignkey(
+            db_field, request, **kwargs
+        )
 
     def get_queryset(self, request):
         """Limit Pages to those that belong to the request's user."""
@@ -32,7 +38,10 @@ class SystemStatVariableAdminInline(admin.StackedInline):
 
 
 class SystemStatVariableAdmin(CoreVariableAdmin):
-    list_display = CoreVariableAdmin.list_display + ('information', 'parameter',)
+    list_display = CoreVariableAdmin.list_display + (
+        "information",
+        "parameter",
+    )
 
     def information(self, instance):
         try:
@@ -47,18 +56,19 @@ class SystemStatVariableAdmin(CoreVariableAdmin):
         return instance.systemstatvariable.parameter
 
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
-        if db_field.name == 'device':
-            kwargs['queryset'] = Device.objects.filter(protocol=PROTOCOL_ID)
-        return super(SystemStatVariableAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
+        if db_field.name == "device":
+            kwargs["queryset"] = Device.objects.filter(protocol=PROTOCOL_ID)
+        return super(SystemStatVariableAdmin, self).formfield_for_foreignkey(
+            db_field, request, **kwargs
+        )
 
     def get_queryset(self, request):
         """Limit Pages to those that belong to the request's user."""
         qs = super(SystemStatVariableAdmin, self).get_queryset(request)
         return qs.filter(device__protocol_id=PROTOCOL_ID)
 
-    inlines = [
-        SystemStatVariableAdminInline
-    ]
+    inlines = [SystemStatVariableAdminInline]
+
 
 # admin_site.register(ExtendedSystemStatDevice, SystemStatDeviceAdmin)
 # admin_site.register(ExtendedSystemStatVariable, SystemStatVariableAdmin)

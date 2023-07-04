@@ -13,21 +13,24 @@ def create_systemstat_devices(apps, schema_editor):
     SystemStatDevice = apps.get_model("systemstat", "SystemStatDevice")
     count = 0
     for item in Device.objects.using(schema_editor.connection.alias).filter(protocol=2):
-        if not hasattr(item, 'systemstatdevice'):
-            item.systemstatdevice = SystemStatDevice.objects.get_or_create(system_stat_device=item)[0]
+        if not hasattr(item, "systemstatdevice"):
+            item.systemstatdevice = SystemStatDevice.objects.get_or_create(
+                system_stat_device=item
+            )[0]
             # item.save()
         count += 1
 
-    logger.info('created %d SystemStat Devices\n' % count)
+    logger.info("created %d SystemStat Devices\n" % count)
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('systemstat', '0014_auto_20230227_1421'),
-        ('pyscada', '0100_device_instrument_handler')
+        ("systemstat", "0014_auto_20230227_1421"),
+        ("pyscada", "0100_device_instrument_handler"),
     ]
 
     operations = [
-        migrations.RunPython(create_systemstat_devices, reverse_code=migrations.RunPython.noop),
+        migrations.RunPython(
+            create_systemstat_devices, reverse_code=migrations.RunPython.noop
+        ),
     ]

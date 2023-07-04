@@ -2,7 +2,12 @@
 from __future__ import unicode_literals
 
 from pyscada.models import Variable, Device
-from pyscada.systemstat.models import SystemStatDevice, SystemStatVariable, ExtendedSystemStatVariable, ExtendedSystemStatDevice
+from pyscada.systemstat.models import (
+    SystemStatDevice,
+    SystemStatVariable,
+    ExtendedSystemStatVariable,
+    ExtendedSystemStatDevice,
+)
 
 from django.dispatch import receiver
 from django.db.models.signals import post_save, pre_delete
@@ -25,9 +30,13 @@ def _reinit_daq_daemons(sender, instance, **kwargs):
     elif type(instance) is SystemStatVariable:
         post_save.send_robust(sender=Variable, instance=instance.system_stat_variable)
     elif type(instance) is ExtendedSystemStatVariable:
-        post_save.send_robust(sender=Variable, instance=Variable.objects.get(pk=instance.pk))
+        post_save.send_robust(
+            sender=Variable, instance=Variable.objects.get(pk=instance.pk)
+        )
     elif type(instance) is ExtendedSystemStatDevice:
-        post_save.send_robust(sender=Device, instance=Device.objects.get(pk=instance.pk))
+        post_save.send_robust(
+            sender=Device, instance=Device.objects.get(pk=instance.pk)
+        )
 
 
 @receiver(pre_delete, sender=SystemStatDevice)
@@ -43,6 +52,10 @@ def _del_daq_daemons(sender, instance, **kwargs):
     elif type(instance) is SystemStatVariable:
         pre_delete.send_robust(sender=Variable, instance=instance.system_stat_variable)
     elif type(instance) is ExtendedSystemStatVariable:
-        pre_delete.send_robust(sender=Variable, instance=Variable.objects.get(pk=instance.pk))
+        pre_delete.send_robust(
+            sender=Variable, instance=Variable.objects.get(pk=instance.pk)
+        )
     elif type(instance) is ExtendedSystemStatDevice:
-        pre_delete.send_robust(sender=Device, instance=Device.objects.get(pk=instance.pk))
+        pre_delete.send_robust(
+            sender=Device, instance=Device.objects.get(pk=instance.pk)
+        )

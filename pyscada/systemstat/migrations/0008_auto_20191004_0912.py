@@ -5,15 +5,16 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('systemstat', '0007_auto_20170916_1143'),
+        ("systemstat", "0007_auto_20170916_1143"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='systemstatvariable',
-            name='system_stat_variable',
-            field=models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to='pyscada.Variable'),
+            model_name="systemstatvariable",
+            name="system_stat_variable",
+            field=models.OneToOneField(
+                on_delete=django.db.models.deletion.CASCADE, to="pyscada.Variable"
+            ),
         ),
     ]
