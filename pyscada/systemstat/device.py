@@ -72,22 +72,38 @@ class Handler(GenericHandlerDevice):
             self.inst = paramiko.SSHClient()
             self.inst.load_system_host_keys()
             self.inst.set_missing_host_key_policy(paramiko.WarningPolicy())
-            self.inst.connect(self._device.systemstatdevice.host,
-                              self._device.systemstatdevice.port,
-                              self._device.systemstatdevice.username,
-                              self._device.systemstatdevice.password,
-                              timeout=self._device.systemstatdevice.timeout)
+            if self._device.systemstatdevice.password is "":
+                self.inst.connect(
+                    self._device.systemstatdevice.host,
+                    self._device.systemstatdevice.port,
+                    self._device.systemstatdevice.username,
+                    timeout=self._device.systemstatdevice.timeout,
+                )
+            else:
+                self.inst.connect(
+                    self._device.systemstatdevice.host,
+                    self._device.systemstatdevice.port,
+                    self._device.systemstatdevice.username,
+                    self._device.systemstatdevice.password,
+                    timeout=self._device.systemstatdevice.timeout,
+                )
             channel = self.inst.get_transport().open_session()
             channel.get_pty()
             self.shell = self.inst.invoke_shell()
             sleep(1)
             while self.shell.recv_ready():
                 self.shell.recv(1)
+            self.inst.close()
             return True
         except (socket.gaierror, paramiko.ssh_exception.SSHException, OSError,
                 socket.timeout, paramiko.ssh_exception.AuthenticationException,
                 paramiko.ssh_exception.NoValidConnectionsError) as e:
             self._not_accessible_reason = e
+            if self.inst is not None and hasattr(slef.inst, "close"):
+                try:
+                    self.inst.close()
+                except:
+                    pass
             self.inst = None
             return False
 
@@ -372,10 +388,21 @@ class Handler(GenericHandlerDevice):
                     inst.load_system_host_keys()
                     inst.set_missing_host_key_policy(paramiko.WarningPolicy())
                     try:
-                        inst.connect(hostname, port, username, password, timeout=timeout)
+                        if password is "":
+                            inst.connect(hostname, port, username, timeout=timeout)
+                        else:
+                            inst.connect(
+                                hostname, port, username, password, timeout=timeout
+                            )
                         value = "OK"
+                        inst.close()
                     except Exception as e:
                         value = str(e)
+                        if inst is not None and hasattr(inst, "close"):
+                            try:
+                                inst.close()
+                            except:
+                                pass
             elif item.systemstatvariable.information == 40:
                 param = item.systemstatvariable.parameter
                 try:
@@ -633,9 +660,18 @@ class Handler(GenericHandlerDevice):
             inst.load_system_host_keys()
             inst.set_missing_host_key_policy(paramiko.WarningPolicy())
             try:
-                inst.connect(hostname, port, username, password, timeout=timeout)
-                i, o, e = inst.exec_command("""python3 -c '""" + str(ssh_prefix) + """print(""" + str(cmd) + """)'""",
-                                            timeout=timeout)
+                if password is "":
+                    inst.connect(hostname, port, username, timeout=timeout)
+                else:
+                    inst.connect(hostname, port, username, password, timeout=timeout)
+                i, o, e = inst.exec_command(
+                    """python3 -c '"""
+                    + str(ssh_prefix)
+                    + """print("""
+                    + str(cmd)
+                    + """)'""",
+                    timeout=timeout,
+                )
                 err = e.read().decode()
                 err = err[:-1] if err.endswith('\n')else err
                 if err != '':
@@ -647,12 +683,21 @@ class Handler(GenericHandlerDevice):
                 value = value[:-1] if value.endswith('\n') else value
                 value = None if value == '' else value
                 inst.close()
-            except (socket.gaierror, paramiko.ssh_exception.SSHException, OSError,
-                    socket.timeout, paramiko.ssh_exception.AuthenticationException,
-                    paramiko.ssh_exception.NoValidConnectionsError) as e:
-                pass
             if value == '' and err != '':
                 logger.warning(f'Error running remote command {cmd} on {hostname}, returns : {err}')
+            except (
+                socket.gaierror,
+                paramiko.ssh_exception.SSHException,
+                OSError,
+                socket.timeout,
+                paramiko.ssh_exception.AuthenticationException,
+                paramiko.ssh_exception.NoValidConnectionsError,
+            ) as e:
+                if inst is not None and hasattr(inst, "close"):
+                    try:
+                        inst.close()
+                    except:
+                        pass
                 value = None
             value = None if value == 'None' else value
         return value
@@ -673,17 +718,29 @@ class Handler(GenericHandlerDevice):
             inst.load_system_host_keys()
             inst.set_missing_host_key_policy(paramiko.WarningPolicy())
             try:
-                inst.connect(hostname, port, username, password, timeout=timeout)
+                if password is "":
+                    inst.connect(hostname, port, username, timeout=timeout)
+                else:
+                    inst.connect(hostname, port, username, password, timeout=timeout)
                 i, o, e = inst.exec_command(str(cmd), timeout=timeout)
                 err = e.read().decode()
                 value = o.read().decode()
                 inst.close()
-            except (socket.gaierror, paramiko.ssh_exception.SSHException, OSError,
-                    socket.timeout, paramiko.ssh_exception.AuthenticationException,
-                    paramiko.ssh_exception.NoValidConnectionsError) as e:
-                pass
             if value == '' and err != '':
                 logger.warning(f'Error running remote command {cmd} on {hostname}, returns : {err}')
+            except (
+                socket.gaierror,
+                paramiko.ssh_exception.SSHException,
+                OSError,
+                socket.timeout,
+                paramiko.ssh_exception.AuthenticationException,
+                paramiko.ssh_exception.NoValidConnectionsError,
+            ) as e:
+                if inst is not None and hasattr(inst, "close"):
+                    try:
+                        inst.close()
+                    except:
+                        pass
                 value = None
         return value
 
