@@ -399,7 +399,7 @@ class Handler(GenericHandlerDevice):
                     cmd = "value"
                     ssh_prefix = f'import psutil\nvalue=-3\nfor proc in psutil.process_iter():\n    try:\n        for cmd in proc.cmdline():\n            if "{processName}".lower() in cmd.lower() and "for proc in psutil.process_iter():" not in cmd.lower():\n                value = proc.pid\n                break\n    except psutil.ZombieProcess:\n        value = -1\n    except psutil.AccessDenied:\n        value = -2\n    except psutil.NoSuchProcess:\n        value = -3\n'
                     value = self.exec_python_cmd(cmd, ssh_prefix=ssh_prefix)
-                    value = -3 if value == "" else value
+                    value = None if value == "" else value
             elif item.systemstatvariable.information == 22:
                 timestamp = time()
                 if self._device.systemstatdevice.system_type == 0:
