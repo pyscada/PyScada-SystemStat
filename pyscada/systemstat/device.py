@@ -104,6 +104,7 @@ class Handler(GenericHandlerDevice):
             socket.timeout,
             paramiko.ssh_exception.AuthenticationException,
             paramiko.ssh_exception.NoValidConnectionsError,
+            ConnectionResetError,
         ) as e:
             self._not_accessible_reason = e
             if self.inst is not None and hasattr(slef.inst, "close"):
@@ -161,6 +162,7 @@ class Handler(GenericHandlerDevice):
                         socket.timeout,
                         paramiko.ssh_exception.AuthenticationException,
                         paramiko.ssh_exception.NoValidConnectionsError,
+                        ConnectionResetError,
                     ) as e:
                         self._not_accessible_reason = e
                         self.inst = None
@@ -772,6 +774,7 @@ class Handler(GenericHandlerDevice):
                 socket.timeout,
                 paramiko.ssh_exception.AuthenticationException,
                 paramiko.ssh_exception.NoValidConnectionsError,
+                ConnectionResetError,
             ) as e:
                 if inst is not None and hasattr(inst, "close"):
                     try:
@@ -817,6 +820,7 @@ class Handler(GenericHandlerDevice):
                 socket.timeout,
                 paramiko.ssh_exception.AuthenticationException,
                 paramiko.ssh_exception.NoValidConnectionsError,
+                ConnectionResetError,
             ) as e:
                 if inst is not None and hasattr(inst, "close"):
                     try:
