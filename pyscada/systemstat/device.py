@@ -74,7 +74,7 @@ class Handler(GenericHandlerDevice):
             self.inst = paramiko.SSHClient()
             self.inst.load_system_host_keys()
             self.inst.set_missing_host_key_policy(paramiko.WarningPolicy())
-            if self._device.systemstatdevice.password is "":
+            if self._device.systemstatdevice.password == "":
                 self.inst.connect(
                     self._device.systemstatdevice.host,
                     self._device.systemstatdevice.port,
@@ -414,7 +414,7 @@ class Handler(GenericHandlerDevice):
                     inst.load_system_host_keys()
                     inst.set_missing_host_key_policy(paramiko.WarningPolicy())
                     try:
-                        if password is "":
+                        if password == "":
                             inst.connect(hostname, port, username, timeout=timeout)
                         else:
                             inst.connect(
@@ -742,7 +742,7 @@ class Handler(GenericHandlerDevice):
             inst.load_system_host_keys()
             inst.set_missing_host_key_policy(paramiko.WarningPolicy())
             try:
-                if password is "":
+                if password == "":
                     inst.connect(hostname, port, username, timeout=timeout)
                 else:
                     inst.connect(hostname, port, username, password, timeout=timeout)
@@ -805,7 +805,7 @@ class Handler(GenericHandlerDevice):
             inst.load_system_host_keys()
             inst.set_missing_host_key_policy(paramiko.WarningPolicy())
             try:
-                if password is "":
+                if password == "":
                     inst.connect(hostname, port, username, timeout=timeout)
                 else:
                     inst.connect(hostname, port, username, password, timeout=timeout)
