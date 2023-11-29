@@ -107,7 +107,7 @@ class Handler(GenericHandlerDevice):
             ConnectionResetError,
         ) as e:
             self._not_accessible_reason = e
-            if self.inst is not None and hasattr(slef.inst, "close"):
+            if self.inst is not None and hasattr(self.inst, "close"):
                 try:
                     self.inst.close()
                 except:
