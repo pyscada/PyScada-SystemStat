@@ -717,9 +717,10 @@ class Handler(GenericHandlerDevice):
                     value = value.replace("\n", "")
             else:
                 value = None
+
             # update variable
-            if value is not None and item.update_value(value, timestamp):
-                output.append(item.create_recorded_data_element())
+            if value is not None and item.update_values([value], [timestamp]):
+                output.append(item)
 
         return output
 
