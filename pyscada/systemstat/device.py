@@ -95,7 +95,7 @@ class Handler(GenericHandlerDevice):
             sleep(1)
             while self.shell.recv_ready():
                 self.shell.recv(1)
-            self.inst.close()
+            #self.inst.close()
             return True
         except (
             socket.gaierror,
