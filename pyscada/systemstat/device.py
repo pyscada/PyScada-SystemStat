@@ -225,6 +225,8 @@ class Handler(GenericHandlerDevice):
             # item = variables_dict[item]
             timestamp = time()
             value = None
+            if not item.readable:
+                continue
             if item.systemstatvariable.information == 0:
                 # cpu_percent
                 if hasattr(psutil, "cpu_percent"):

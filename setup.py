@@ -31,7 +31,7 @@ setup(
     platforms=["OS Independent"],
     classifiers=CLASSIFIERS,
     install_requires=[
-        "pyscada>=0.8.2",
+        "pyscada>=0.8.3",
         "psutil>=2.1.1",
         "paramiko",
     ],
