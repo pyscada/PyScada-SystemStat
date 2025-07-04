@@ -1,15 +1,75 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from pyscada.models import Variable, Device, Dictionary
+from pyscada.models import Variable, Device, Dictionary, DataSource
 from . import PROTOCOL_ID
 
 from django.forms.models import BaseInlineFormSet
 from django.db import models
 import datetime
+from time import time
 import logging
 
 logger = logging.getLogger(__name__)
+
+
+
+class TimestampDataSource(models.Model):
+    datasource = models.OneToOneField(DataSource, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"TimestampDataSource"
+
+    def last_value(self, **kwargs):
+        read_time = None
+        read_value = None
+
+        if "variable" in kwargs:
+            variable = kwargs.pop("variable")
+
+            if hasattr(variable, "systemstatvariable") and getattr(variable, "systemstatvariable") is not None:
+
+                value = datetime.datetime.now().replace(tzinfo=datetime.timezone.utc)
+                try:
+                    value += datetime.timedelta(
+                        seconds=int(variable.systemstatvariable.parameter),
+                        milliseconds=int(
+                            (float(variable.systemstatvariable.parameter) - int(variable.systemstatvariable.parameter)) * 1000
+                        ),
+                    )
+                except (ValueError, TypeError):
+                    pass
+                read_value = value.timestamp()
+                read_time = datetime.datetime.now().timestamp()
+
+        return [read_time, read_value]
+
+    def read_multiple(self, **kwargs):
+
+        output = {"timestamp": time() * 1000, "date_saved_max": time() * 1000}
+
+        variable_ids = kwargs.pop("variable_ids") if "variable_ids" in kwargs else []
+        variable_ids = self.datasource.datasource_check(
+            variable_ids, items_as_id=True, ids_model=Variable
+        )
+
+        for v_id in variable_ids:
+            try:
+                v = Variable.objects.get(id=v_id)
+                output[v_id] = self.last_value(variable=v)
+            except Variable.DoesNotExist:
+                logger.info(f"variable id {v_id} not found.")
+
+        return output
+
+    def write_multiple(self, **kwargs):
+        pass
+
+    def get_first_element_timestamp(self, **kwargs):
+        pass
+
+    def get_last_element_timestamp(self, **kwargs):
+        pass
 
 
 class SystemStatDevice(models.Model):
@@ -179,26 +239,11 @@ class SystemStatVariable(models.Model):
         elif self.information == 20:
             self.system_stat_variable.dictionary = dp
             self.system_stat_variable.save()
-
-    def query_prev_value(self, time_min=None):
-        if self.information == 300:
-            value = datetime.datetime.now().replace(tzinfo=datetime.timezone.utc)
-            try:
-                value += datetime.timedelta(
-                    seconds=int(self.parameter),
-                    milliseconds=int(
-                        (float(self.parameter) - int(self.parameter)) * 1000
-                    ),
-                )
-            except (ValueError, TypeError):
-                pass
-            self.system_stat_variable.prev_value = value.timestamp()
-            self.system_stat_variable.timestamp_old = (
-                datetime.datetime.now().timestamp()
-            )
-            return True
-
-        return self.system_stat_variable.query_prev_value(time_min, False)
+        elif self.information == 300:
+            from .apps import init_timestamp_datasource
+            dsm, ds, ldse = init_timestamp_datasource()
+            self.system_stat_variable.datasource = ds
+            self.system_stat_variable.save()
 
 
 class ExtendedSystemStatDevice(Device):
